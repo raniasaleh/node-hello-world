@@ -86,7 +86,7 @@ jobs:
       uses: anchore/scan-action@v2
       id: scan
       with:
-        image: "raniasaleh/web-dvwa:latest"
+        image: "raniasaleh/node-hello-world:latest"
         fail-build: true
         acs-report-enable: true
     - name: upload Anchore scan SARIF report
