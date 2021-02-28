@@ -124,9 +124,9 @@ jobs:
   zap_scan:
     needs: Deploy
     runs-on: ubuntu-latest
-    name: Scan the Deployed Website
+    name: OWASP ZAP: Dynamic Application Security Testing (DAST)
     steps:
       - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.1.0
         with:
-          target: 'http://169.57.112.57:30002/index.php'
+          target: 'http://169.57.112.57:30002/'
