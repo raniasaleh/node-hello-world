@@ -99,6 +99,8 @@ jobs:
     name: Deploy to IBM Cloud
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@v2
     - name: Install IBM Cloud CLI
       run: |
         curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
