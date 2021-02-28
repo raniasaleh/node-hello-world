@@ -8,6 +8,9 @@ env:
   IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
   IBM_CLOUD_REGION: us-south
   IKS_CLUSTER: asset-test-rania # name or id of cluster
+  ICR_NAMESPACE: raniasaleh
+  REGISTRY_HOSTNAME: dockerhub
+  IMAGE_NAME: node-hello-world
 jobs:
   fetch-code:
     runs-on: 'ubuntu-latest'
@@ -24,7 +27,7 @@ jobs:
     steps:
     - uses: sburris/dependency-check-action@master
       with:
-        Project-Name: node-hello-world
+        Project-Name: ${{ env.IMAGE_NAME }}
   check-for-secrets:
     name: Detect Secrets
     runs-on: 'ubuntu-latest'
@@ -69,7 +72,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: raniasaleh/node-hello-world:latest
+          tags: raniasaleh/${{ env.IMAGE_NAME }}:latest
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
