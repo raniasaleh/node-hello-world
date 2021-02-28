@@ -1,0 +1,114 @@
+
+name: Build and Deploy to IKS
+
+on: [push]
+
+# Environment variables available to all jobs and steps in this workflow
+env:
+  IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
+  IBM_CLOUD_REGION: us-south
+  ICR_NAMESPACE: raniasaleh
+  REGISTRY_HOSTNAME: dockerhub
+  IMAGE_NAME: web-dvwa
+  IKS_CLUSTER: asset-test-rania # name or id of cluster
+
+jobs:
+  dependcy-check:
+    name: OWASP Dependency Check
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: sburris/dependency-check-action@master
+      with:
+        Project-Name: web-dvwa
+  check-for-secrets:
+    name: Check for Secrets
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@master
+    - name: trufflehog-actions-scan
+      uses: edplato/trufflehog-actions-scan@master
+  sonarcloud:
+    name: Run Sonar Scan
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        # Disabling shallow clone is recommended for improving relevancy of reporting
+        fetch-depth: 0
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  Build-publish-Image:
+    name: Build and Push Docker Image
+    needs: [dependcy-check, sonarcloud, check-for-secrets]
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: raniasaleh/web-dvwa:latest
+      # -
+      #   name: VA scan
+      #   uses: anchore/scan-action@v2
+      #   with:
+      #     image: "raniasaleh/web-dvwa:latest"
+      #     # path: "./Dockerfile"
+      #     fail-build: false
+      -
+        name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+  Deploy:
+    needs: Build-publish-Image
+    name: Deploy to IBM Cloud
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    # Download and Install IBM Cloud CLI
+    - name: Install IBM Cloud CLI
+      run: |
+        curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+        ibmcloud --version
+        ibmcloud config --check-version=false
+        ibmcloud plugin install -f kubernetes-service
+        ibmcloud plugin install -f container-registry
+
+    # Authenticate with IBM Cloud CLI
+    - name: Authenticate with IBM Cloud CLI
+      run: |
+        ibmcloud login --apikey "${IBM_CLOUD_API_KEY}" -r "${IBM_CLOUD_REGION}" -g asset-test-rania
+        ibmcloud cr region-set "${IBM_CLOUD_REGION}"
+        ibmcloud cr login
+    # Deploy the Docker image to the IKS cluster
+    - name: Deploy to IKS
+      run: |
+        ibmcloud ks cluster config --cluster $IKS_CLUSTER
+        kubectl config current-context
+        kubectl apply -f namespace.yaml
+        kubectl apply -f deployment.yaml
+  zap_scan:
+    needs: Deploy
+    runs-on: ubuntu-latest
+    name: Scan the Deployed Website
+    steps:
+      - name: ZAP Scan
+        uses: zaproxy/action-full-scan@v0.1.0
+        with:
+          target: 'http://169.57.112.57:30001/index.php'
