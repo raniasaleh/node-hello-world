@@ -8,8 +8,7 @@ env:
   IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
   IBM_CLOUD_REGION: us-south
   IKS_CLUSTER: asset-test-rania # name or id of cluster
-  ICR_NAMESPACE: raniasaleh
-  REGISTRY_HOSTNAME: dockerhub
+  NAMESPACE: ${{ secrets.NAMESPACE }} 
   IMAGE_NAME: node-hello-world
 jobs:
   fetch-code:
@@ -72,7 +71,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: raniasaleh/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:latest
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
@@ -85,7 +84,7 @@ jobs:
       uses: anchore/scan-action@v2
       id: scan
       with:
-        image: "raniasaleh/node-hello-world:latest"
+        image: "${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:latest"
         fail-build: true
         acs-report-enable: true
     - name: upload Anchore scan SARIF report
