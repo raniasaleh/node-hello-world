@@ -1,4 +1,4 @@
-FROM node:tls
+FROM node
 WORKDIR /usr/src/app
 COPY package*.json app.js ./
 RUN npm install
