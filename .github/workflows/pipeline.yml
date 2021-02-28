@@ -13,9 +13,18 @@ env:
   IKS_CLUSTER: asset-test-rania # name or id of cluster
 
 jobs:
+  fetch-code:
+    runs-on: 'ubuntu-latest'
+    name: Fetch latest code
+    steps:
+    - uses: actions/checkout@master
+      with:
+        # Disabling shallow clone is recommended for improving relevancy of reporting
+        fetch-depth: 0
   dependcy-check:
     name: OWASP Dependency Check
     runs-on: 'ubuntu-latest'
+    needs: fetch-code
     steps:
     - uses: sburris/dependency-check-action@master
       with:
@@ -23,18 +32,15 @@ jobs:
   check-for-secrets:
     name: Check for Secrets
     runs-on: 'ubuntu-latest'
+    needs: fetch-code
     steps:
-    - uses: actions/checkout@master
     - name: trufflehog-actions-scan
       uses: edplato/trufflehog-actions-scan@master
   sonarcloud:
     name: Run Sonar Scan
     runs-on: ubuntu-latest
+    needs: fetch-code
     steps:
-    - uses: actions/checkout@v2
-      with:
-        # Disabling shallow clone is recommended for improving relevancy of reporting
-        fetch-depth: 0
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       env:
