@@ -1,5 +1,5 @@
 
-name: Build and Deploy to IKS
+name: DevSecOps Pipeline Example
 
 on: [push]
 
