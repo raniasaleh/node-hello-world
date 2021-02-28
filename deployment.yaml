@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: hello-world
-        image: raniasaleh/hello-world
+        image: raniasaleh/node-hello-world
         imagePullPolicy: Always
         ports:
         - containerPort: 80
