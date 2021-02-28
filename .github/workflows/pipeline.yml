@@ -87,8 +87,12 @@ jobs:
       uses: anchore/scan-action@v2
       runs-on: ubuntu-latest
       steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      steps:
+        - name: ZAP Scan
+          uses: zaproxy/action-full-scan@v0.1.0
+          with:
+            target: 'http://${{ env.IP }}:${{ env.PORT }}/'
+
     #   id: scan
     #   with:
     #     image: "${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:latest"
