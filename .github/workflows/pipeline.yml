@@ -52,7 +52,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   Build-publish-Image:
-    name: Build and Push Docker Image
+    name: Build and Push Image
     needs: [dependcy-check, check-for-secrets]
     runs-on: ubuntu-latest
     steps:
