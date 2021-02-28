@@ -7,11 +7,7 @@ on: [push]
 env:
   IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
   IBM_CLOUD_REGION: us-south
-  ICR_NAMESPACE: raniasaleh
-  REGISTRY_HOSTNAME: dockerhub
-  IMAGE_NAME: node-hello-world
   IKS_CLUSTER: asset-test-rania # name or id of cluster
-
 jobs:
   fetch-code:
     runs-on: 'ubuntu-latest'
@@ -124,7 +120,7 @@ jobs:
   zap_scan:
     needs: Deploy
     runs-on: ubuntu-latest
-    name: OWASP ZAP Dynamic Application Security Testing (DAST)
+    name: OWASP ZAP-DAST
     steps:
       - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.1.0
