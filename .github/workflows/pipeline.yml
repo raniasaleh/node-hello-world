@@ -6,7 +6,8 @@ on: [push]
 # Environment variables available to all jobs and steps in this workflow
 env:
   IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
-  IBM_CLOUD_REGION: us-south
+  IBM_CLOUD_REGION: ${{ secrets.IBM_CLOUD_REGION }} 
+  IBM_CLOUD_RESOURCE_GROUP: ${{ secrets.IBM_CLOUD_RESOURCE_GROUP }}
   IKS_CLUSTER: ${{ secrets.IKS_CLUSTER }} # name or id of cluster
   NAMESPACE: ${{ secrets.NAMESPACE }}
   IP: ${{ secrets.IKS_CLUSTER_IP }}
@@ -112,7 +113,7 @@ jobs:
     # Authenticate with IBM Cloud CLI
     - name: Authenticate with IBM Cloud CLI
       run: |
-        ibmcloud login --apikey "${IBM_CLOUD_API_KEY}" -r "${IBM_CLOUD_REGION}" -g asset-test-rania
+        ibmcloud login --apikey "${IBM_CLOUD_API_KEY}" -r "${IBM_CLOUD_REGION}" -g "${IBM_CLOUD_RESOURCE_GROUP}"
         ibmcloud cr region-set "${IBM_CLOUD_REGION}"
         ibmcloud cr login
     # Deploy the Docker image to the IKS cluster
