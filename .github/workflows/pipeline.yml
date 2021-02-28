@@ -15,7 +15,7 @@ env:
 jobs:
   fetch-code:
     runs-on: 'ubuntu-latest'
-    name: Fetch latest code
+    name: Fetch Latest Code
     steps:
     - uses: actions/checkout@master
       with:
@@ -30,14 +30,14 @@ jobs:
       with:
         Project-Name: node-hello-world
   check-for-secrets:
-    name: Check for Secrets
+    name: Detect Secrets
     runs-on: 'ubuntu-latest'
     needs: fetch-code
     steps:
     - name: trufflehog-actions-scan
       uses: edplato/trufflehog-actions-scan@master
   sonarcloud:
-    name: Run Sonar Scan
+    name: SonarCloud Scan
     runs-on: ubuntu-latest
     needs: fetch-code
     steps:
@@ -90,11 +90,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     -
-      name: VA scan
+      name: Anchore Container Scan
       uses: anchore/scan-action@v2
       with:
         image: "raniasaleh/web-dvwa:latest"
         fail-build: true
+         acs-report-enable: true
+    - name: upload Anchore scan SARIF report
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: ${{ steps.scan.outputs.sarif }}
   Deploy:
     needs: Build-publish-Image
     name: Deploy to IBM Cloud
