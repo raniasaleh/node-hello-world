@@ -85,9 +85,8 @@ jobs:
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
   VA:
-    name: VA Scanning
-    needs: Build-publish-Image
     name: Anchore Container Scan
+    needs: Build-publish-Image
     runs-on: ubuntu-latest
     steps:
     - name: Scan current project
