@@ -52,7 +52,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   Build-publish-Image:
     name: Build and Push Docker Image
-    needs: [dependcy-check, sonarcloud, check-for-secrets]
+    needs: [dependcy-check, check-for-secrets]
     runs-on: ubuntu-latest
     steps:
       -
@@ -74,13 +74,6 @@ jobs:
         with:
           push: true
           tags: raniasaleh/node-hello-world:latest
-      # -
-      #   name: VA scan
-      #   uses: anchore/scan-action@v2
-      #   with:
-      #     image: "raniasaleh/node-hello-world:latest"
-      #     # path: "./Dockerfile"
-      #     fail-build: false
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
