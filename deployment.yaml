@@ -1,34 +1,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: node-hello-world
+  name: hello-world
   labels:
-    app: node-hello-world
+    app: hello-world
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: node-hello-world
+      app: hello-world
   template:
     metadata:
       labels:
-        app: node-hello-world
+        app: hello-world
     spec:
       containers:
-      - name: node-hello-world
-        image: raniasaleh/node-hello-world
+      - name: hello-world
+        image: raniasaleh/hello-world
         imagePullPolicy: Always
         ports:
         - containerPort: 80
-          name: node-hello-world
+          name: hello-world
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: node-hello-world
+  name: hello-world
 spec:
   selector:
-    app: node-hello-world
+    app: hello-world
   ports:
   - protocol: "TCP"
     port: 80
