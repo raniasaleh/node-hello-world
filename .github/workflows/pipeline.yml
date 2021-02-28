@@ -83,17 +83,9 @@ jobs:
     needs: Build-publish-Image
     runs-on: ubuntu-latest
     steps:
-    - name: Scan current project
-      uses: anchore/scan-action@v2
-      runs-on: ubuntu-latest
-      steps:
-      steps:
-        - name: ZAP Scan
-          uses: zaproxy/action-full-scan@v0.1.0
-          with:
-            target: 'http://${{ env.IP }}:${{ env.PORT }}/'
-
-    #   id: scan
+      -
+        name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
     #   with:
     #     image: "${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:latest"
     #     fail-build: true
